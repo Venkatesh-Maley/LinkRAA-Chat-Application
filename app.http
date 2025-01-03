@@ -1,0 +1,35 @@
+###
+POST http://localhost:5000/register
+Content-Type: application/json
+
+{
+    "username" : "sudharshan",
+    "email" : "sudharshan@gmail.com",
+    "password" : "sudharshan",
+    "confirmpassword" : "sudharshan"
+}
+
+###
+POST http://localhost:5000/login
+Content-Type: application/json
+
+{
+    "email" : "sudharshan@gmail.com",
+    "password" : "sudharshan"
+}
+
+###
+POST http://localhost:5000/share
+x-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjY5ZDQ1NmQ0YjVjZTc3MzViZjQ4ZDc2In0sImlhdCI6MTcyMTkwMDk3NiwiZXhwIjoxNzIxOTA0NTc2fQ.3-tBUFvcw-iGDHqYkjRgLLnjofvxKw-Bqw9s50rEoU0
+Content-Type: application/json
+
+{
+"name": "venky123",
+"email": "venky123@gmail.com",
+"phone": "79138343409",
+"branch": "CSE", 
+"passingYear": "2025", 
+"resumeLink": "www.resume.com", 
+"portfolioLink": "www.pror.com"
+}
+

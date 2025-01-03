@@ -1,0 +1,76 @@
+.myprofile-container {
+    background-color: #ffffff;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.chat-container {
+    max-width: 800px;
+    margin: 0 auto;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+}
+
+.chat-title {
+    color: #1a1a45;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.messages-container {
+    max-height: 400px;
+    overflow-y: auto;
+    margin-bottom: 20px;
+}
+
+.message-card {
+    background-color: #eaf5ff;
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+
+.message-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+.message-date {
+    font-size: 12px;
+    color: #666;
+}
+
+.message-text {
+    margin: 0;
+}
+
+.loading-text {
+    text-align: center;
+    color: #666;
+}
+
+.message-form {
+    margin-bottom: 20px;
+}
+
+.message-input {
+    flex-grow: 1;
+}
+
+.send-button, .logout-button {
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.send-button:hover {
+    background-color: #060666;
+}
+
+.logout-button {
+    display: block;
+    margin: 20px auto 0;
+}
