@@ -1,22 +1,32 @@
+require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const Registeruser = require('./model');
 const jwt = require('jsonwebtoken');
 const middleware = require('./middleware');
 const Msgmodel = require('./msgmodel');
-const Sharemodel = require('./sharemodel'); // New model for shared details
+const Sharemodel = require('./sharemodel');
 const cors = require('cors');
 const app = express();
 
-mongoose.connect("mongodb+srv://venkychat:venkychat@cluster0.d47qttq.mongodb.net/")
+// Use environment variable for MongoDB URI or fallback to the provided one (for local dev)
+const mongoURI = process.env.MONGODB_URI || "mongodb+srv://venkychat:venkychat@cluster0.d47qttq.mongodb.net/";
+const jwtSecret = process.env.JWT_SECRET || 'jwtSecret';
+
+mongoose.connect(mongoURI)
     .then(() => console.log('DB Connected...'))
     .catch(err => console.log(err));
 
 app.use(express.json());
 app.use(cors({ origin: "*" }));
 
+// Health check route
+app.get('/api/health', (req, res) => {
+    res.status(200).json({ status: 'OK' });
+});
+
 // Existing routes
-app.post('/register', async (req, res) => {
+app.post('/api/register', async (req, res) => {
     try {
         const { username, email, password, confirmpassword } = req.body;
         let exist = await Registeruser.findOne({ email });
@@ -40,7 +50,7 @@ app.post('/register', async (req, res) => {
     }
 });
 
-app.post('/login', async (req, res) => {
+app.post('/api/login', async (req, res) => {
     const { email, password } = req.body;
     try {
         let exist = await Registeruser.findOne({ email });
@@ -55,7 +65,7 @@ app.post('/login', async (req, res) => {
                 id: exist.id
             }
         };
-        jwt.sign(payload, 'jwtSecret', { expiresIn: '1h' },
+        jwt.sign(payload, jwtSecret, { expiresIn: '1h' },
             (err, token) => {
                 if (err) throw err;
                 return res.json({ token });
@@ -67,7 +77,7 @@ app.post('/login', async (req, res) => {
     }
 });
 
-app.get('/myprofile', middleware, async (req, res) => {
+app.get('/api/myprofile', middleware, async (req, res) => {
     try {
         let exist = await Registeruser.findById(req.user.id);
         if (!exist) {
@@ -80,7 +90,7 @@ app.get('/myprofile', middleware, async (req, res) => {
     }
 });
 
-app.post('/addmsg', middleware, async (req, res) => {
+app.post('/api/addmsg', middleware, async (req, res) => {
     try {
         const { text } = req.body;
         const exist = await Registeruser.findById(req.user.id);
@@ -98,7 +108,7 @@ app.post('/addmsg', middleware, async (req, res) => {
     }
 });
 
-app.get('/getmsg', middleware, async (req, res) => {
+app.get('/api/getmsg', middleware, async (req, res) => {
     try {
         let allmsg = await Msgmodel.find();
         res.json(allmsg);
@@ -108,12 +118,10 @@ app.get('/getmsg', middleware, async (req, res) => {
     }
 });
 
-// New route to handle form submissions
-app.post('/share', middleware, async (req, res) => {
+app.post('/api/share', middleware, async (req, res) => {
     try {
         const { name, email, phone, branch, passingYear, resumeLink, portfolioLink } = req.body;
 
-        // Validate required fields
         if (!name || !email || !phone || !branch || !passingYear) {
             return res.status(400).json({ error: 'All required fields must be filled' });
         }
@@ -131,16 +139,13 @@ app.post('/share', middleware, async (req, res) => {
 
         await newShare.save();
         res.status(200).json({ message: 'shared Successfully' });
-        // const allShares = await Sharemodel.find();
-        // res.json(allShares);
     } catch (err) {
         console.error('Share Error:', err);
         res.status(500).json({ error: 'Server Error' });
     }
 });
 
-// New route to get shared details
-app.get('/share1', async (req, res) => {
+app.get('/api/share1', async (req, res) => {
     try {
         const allShares = await Sharemodel.find();
         res.json(allShares);
@@ -150,6 +155,13 @@ app.get('/share1', async (req, res) => {
     }
 });
 
-app.listen(5000, () => {
-    console.log('Server Running...');
-});
+// Conditionally start server if not running as a Vercel serverless function
+if (process.env.NODE_ENV !== 'production') {
+    const PORT = process.env.PORT || 5000;
+    app.listen(PORT, () => {
+        console.log(`Server Running on port ${PORT}...`);
+    });
+}
+
+// Export the app for Vercel
+module.exports = app;
